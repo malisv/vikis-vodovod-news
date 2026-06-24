@@ -1,0 +1,1 @@
+"""Sensor platform for vikis_vodovod_news."""

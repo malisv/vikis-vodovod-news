@@ -1,0 +1,1 @@
+"""Config flow for vikis_vodovod_news."""

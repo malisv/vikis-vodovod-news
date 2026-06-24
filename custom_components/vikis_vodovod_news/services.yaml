@@ -1,0 +1,4 @@
+scan_now:
+  name: Scan now
+  description: Trigger an immediate scan for new water utility news.
+  target: {}

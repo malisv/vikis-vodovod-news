@@ -1,0 +1,1 @@
+"""Init for vikis_vodovod_news."""
