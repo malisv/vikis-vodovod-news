@@ -1,5 +1,7 @@
 # Vikis Vodovod News — Home Assistant Integration
 
+> **Disclaimer:** This project is entirely vibe-coded. It was built through AI-assisted conversations and may contain quirks. Use at your own risk — test before relying on it in production.
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
 Home Assistant custom integration that scrapes water utility notifications from
@@ -35,7 +37,7 @@ Copy the `custom_components/vikis_vodovod_news/` folder to your Home Assistant
 2. Enter the latest known news ID (e.g., `606`) — you can find this by browsing
    `https://vikis.info/sr/event/show/606` and incrementing until you get a 500 error
 3. Set polling interval (default: 2 hours)
-4. Optionally enter comma-separated keywords for priority flagging (e.g., `Dabrobosanska, Zlatište`)
+4. Optionally enter comma-separated keywords for priority flagging (e.g., `Vodovodna, Vrelo`)
 5. Set max stored news items (default: 20)
 
 ## Sensor attributes

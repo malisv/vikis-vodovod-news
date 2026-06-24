@@ -83,7 +83,7 @@ def mock_entry():
     entry.data = {
         CONF_LATEST_NEWS_ID: 606,
         CONF_POLL_INTERVAL: 120,
-        CONF_KEYWORDS: "Dabrobosanska, Zlatište",
+        CONF_KEYWORDS: "Vodovodna, Vrelo",
         CONF_MAX_NEWS_ITEMS: 20,
     }
     entry.options = {}
@@ -120,14 +120,14 @@ class TestParseKeywords:
         assert VikisVodovodNewsCoordinator._parse_keywords("") == []
 
     def test_single(self):
-        assert VikisVodovodNewsCoordinator._parse_keywords("Dabrobosanska") == [
-            "Dabrobosanska"
+        assert VikisVodovodNewsCoordinator._parse_keywords("Vodovodna") == [
+            "Vodovodna"
         ]
 
     def test_multiple(self):
         assert VikisVodovodNewsCoordinator._parse_keywords(
-            "Dabrobosanska, Zlatište"
-        ) == ["Dabrobosanska", "Zlatište"]
+            "Vodovodna, Vrelo"
+        ) == ["Vodovodna", "Vrelo"]
 
     def test_whitespace(self):
         assert VikisVodovodNewsCoordinator._parse_keywords(
@@ -155,7 +155,7 @@ class TestEvaluatePriority:
     def test_match_title(self):
         assert (
             VikisVodovodNewsCoordinator._evaluate_priority(
-                "Dabrobosanska ulica", "opis", ["Dabrobosanska"]
+                "Vodovodna ulica", "opis", ["Vodovodna"]
             )
             is True
         )
@@ -173,7 +173,7 @@ class TestEvaluatePriority:
     def test_case_insensitive(self):
         assert (
             VikisVodovodNewsCoordinator._evaluate_priority(
-                "dabrobosanska ulica", "opis", ["Dabrobosanska"]
+                "vodovodna ulica", "opis", ["Vodovodna"]
             )
             is True
         )
@@ -181,7 +181,7 @@ class TestEvaluatePriority:
     def test_no_match(self):
         assert (
             VikisVodovodNewsCoordinator._evaluate_priority(
-                "Neke druge vijesti", "opis", ["Dabrobosanska"]
+                "Neke druge vijesti", "opis", ["Vodovodna"]
             )
             is False
         )
@@ -189,7 +189,7 @@ class TestEvaluatePriority:
     def test_multiple_keywords_one_match(self):
         assert (
             VikisVodovodNewsCoordinator._evaluate_priority(
-                "Zlatište rezervoar", "opis", ["Dabrobosanska", "Zlatište"]
+                "Vrelo rezervoar", "opis", ["Vodovodna", "Vrelo"]
             )
             is True
         )
@@ -197,7 +197,7 @@ class TestEvaluatePriority:
     def test_none_title(self):
         assert (
             VikisVodovodNewsCoordinator._evaluate_priority(
-                None, "Dabrobosanska ulica", ["Dabrobosanska"]
+                None, "Vodovodna ulica", ["Vodovodna"]
             )
             is True
         )
@@ -245,7 +245,7 @@ class TestParseHtml:
 class TestReevaluatePriorities:
     def test_reevaluate_with_keywords(self, coordinator):
         news = [
-            {"id": 606, "title": "Dabrobosanska ulica", "description": "", "priority": False},
+            {"id": 606, "title": "Vodovodna ulica", "description": "", "priority": False},
             {"id": 607, "title": "Druga vijest", "description": "", "priority": True},
         ]
         result = coordinator._reevaluate_priorities(news)
@@ -258,7 +258,7 @@ class TestReevaluatePriorities:
     def test_no_keywords_stays_false(self, coordinator):
         coordinator._filter_keywords = []
         news = [
-            {"id": 606, "title": "Dabrobosanska", "description": "", "priority": False},
+            {"id": 606, "title": "Vodovodna", "description": "", "priority": False},
         ]
         result = coordinator._reevaluate_priorities(news)
         assert result[0]["priority"] is False
@@ -274,7 +274,7 @@ class TestMergedConfig:
         cfg = coordinator._merged_config()
         assert cfg[CONF_LATEST_NEWS_ID] == 606
         assert cfg[CONF_POLL_INTERVAL] == 120
-        assert cfg[CONF_KEYWORDS] == "Dabrobosanska, Zlatište"
+        assert cfg[CONF_KEYWORDS] == "Vodovodna, Vrelo"
         assert cfg[CONF_MAX_NEWS_ITEMS] == 20
 
     def test_options_override_data(self, coordinator):
@@ -523,7 +523,7 @@ class TestConfigFlow:
         assert result["step_id"] == "keywords"
 
         # Step 3: keywords
-        result = await flow.async_step_keywords({CONF_KEYWORDS: "Dabrobosanska"})
+        result = await flow.async_step_keywords({CONF_KEYWORDS: "Vodovodna"})
         assert result["step_id"] == "max_news_items"
 
         # Step 4: max items → create entry
@@ -532,7 +532,7 @@ class TestConfigFlow:
         assert result["title"] == "Vikis Vodovod News"
         assert result["data"][CONF_LATEST_NEWS_ID] == 606
         assert result["data"][CONF_POLL_INTERVAL] == 60
-        assert result["data"][CONF_KEYWORDS] == "Dabrobosanska"
+        assert result["data"][CONF_KEYWORDS] == "Vodovodna"
         assert result["data"][CONF_MAX_NEWS_ITEMS] == 10
 
     @pytest.mark.asyncio
@@ -560,7 +560,7 @@ class TestOptionsFlow:
         entry.data = {
             CONF_LATEST_NEWS_ID: 606,
             CONF_POLL_INTERVAL: 120,
-            CONF_KEYWORDS: "Dabrobosanska",
+            CONF_KEYWORDS: "Vodovodna",
             CONF_MAX_NEWS_ITEMS: 20,
         }
         entry.options = {CONF_POLL_INTERVAL: 60}
@@ -576,7 +576,7 @@ class TestOptionsFlow:
         result = await flow.async_step_init({
             CONF_LATEST_NEWS_ID: 606,
             CONF_POLL_INTERVAL: 60,
-            CONF_KEYWORDS: "Dabrobosanska",
+            CONF_KEYWORDS: "Vodovodna",
             CONF_MAX_NEWS_ITEMS: 20,
         })
         assert result["type"] == "create_entry"
