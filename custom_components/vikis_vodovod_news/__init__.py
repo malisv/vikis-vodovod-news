@@ -1,16 +1,11 @@
-import logging
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 from .coordinator import VikisVodovodNewsCoordinator
-from .sensor import async_setup_entry as async_setup_sensor_entry
 
 PLATFORMS = [Platform.SENSOR]
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

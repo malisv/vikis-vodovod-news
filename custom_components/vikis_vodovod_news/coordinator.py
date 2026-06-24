@@ -84,7 +84,6 @@ class VikisVodovodNewsCoordinator(DataUpdateCoordinator):
         candidate = last_id + 1
         limit = last_id + 1 + MAX_SCAN_ATTEMPTS
         discovered: list[dict] = []
-        has_gap = False
 
         while candidate <= limit:
             item = await self._fetch_and_parse(candidate)
