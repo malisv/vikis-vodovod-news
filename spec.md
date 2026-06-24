@@ -113,7 +113,7 @@ Store persistence in the coordinator (no `RestoreEntity` needed).
   "iot_class": "cloud_polling",
   "requirements": [],
   "dependencies": [],
-  "codeowners": ["@your_github_handle"],
+  "codeowners": ["malisv"],
   "config_flow": true
 }
 ```
