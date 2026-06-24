@@ -21,7 +21,6 @@ class VikisVodovodNewsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._data = {}
 
     async def async_step_user(self, user_input=None):
-        errors = {}
         if user_input is not None:
             self._data[CONF_LATEST_NEWS_ID] = user_input[CONF_LATEST_NEWS_ID]
             return await self.async_step_poll_interval()
@@ -32,11 +31,9 @@ class VikisVodovodNewsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_LATEST_NEWS_ID): cv.positive_int,
                 }
             ),
-            errors=errors,
         )
 
     async def async_step_poll_interval(self, user_input=None):
-        errors = {}
         if user_input is not None:
             self._data[CONF_POLL_INTERVAL] = user_input[CONF_POLL_INTERVAL]
             return await self.async_step_keywords()
@@ -49,11 +46,9 @@ class VikisVodovodNewsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     ): cv.positive_int,
                 }
             ),
-            errors=errors,
         )
 
     async def async_step_keywords(self, user_input=None):
-        errors = {}
         if user_input is not None:
             self._data[CONF_KEYWORDS] = user_input.get(CONF_KEYWORDS, "")
             return await self.async_step_max_news_items()
@@ -64,11 +59,9 @@ class VikisVodovodNewsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Optional(CONF_KEYWORDS, default=""): str,
                 }
             ),
-            errors=errors,
         )
 
     async def async_step_max_news_items(self, user_input=None):
-        errors = {}
         if user_input is not None:
             self._data[CONF_MAX_NEWS_ITEMS] = user_input[CONF_MAX_NEWS_ITEMS]
             return self.async_create_entry(
@@ -84,7 +77,6 @@ class VikisVodovodNewsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     ): cv.positive_int,
                 }
             ),
-            errors=errors,
         )
 
 
@@ -93,29 +85,27 @@ class VikisVodovodNewsOptionsFlow(config_entries.OptionsFlow):
         self._config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
-        errors = {}
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
-        data = self._config_entry.data
+        merged = {**self._config_entry.data, **self._config_entry.options}
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
                 {
                     vol.Required(
-                        CONF_LATEST_NEWS_ID, default=data.get(CONF_LATEST_NEWS_ID)
+                        CONF_LATEST_NEWS_ID, default=merged.get(CONF_LATEST_NEWS_ID)
                     ): cv.positive_int,
                     vol.Required(
                         CONF_POLL_INTERVAL,
-                        default=data.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL),
+                        default=merged.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL),
                     ): cv.positive_int,
                     vol.Optional(
-                        CONF_KEYWORDS, default=data.get(CONF_KEYWORDS, "")
+                        CONF_KEYWORDS, default=merged.get(CONF_KEYWORDS, "")
                     ): str,
                     vol.Required(
                         CONF_MAX_NEWS_ITEMS,
-                        default=data.get(CONF_MAX_NEWS_ITEMS, DEFAULT_MAX_NEWS_ITEMS),
+                        default=merged.get(CONF_MAX_NEWS_ITEMS, DEFAULT_MAX_NEWS_ITEMS),
                     ): cv.positive_int,
                 }
             ),
-            errors=errors,
         )

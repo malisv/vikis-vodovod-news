@@ -17,6 +17,8 @@ from .const import (
     CONF_LATEST_NEWS_ID,
     CONF_MAX_NEWS_ITEMS,
     CONF_POLL_INTERVAL,
+    DEFAULT_MAX_NEWS_ITEMS,
+    DEFAULT_POLL_INTERVAL,
     DOMAIN,
     MAX_SCAN_ATTEMPTS,
     STORAGE_KEY,
@@ -34,12 +36,12 @@ class VikisVodovodNewsCoordinator(DataUpdateCoordinator):
             config.get(CONF_KEYWORDS, "")
         )
         self._max_news_items: int = config.get(
-            CONF_MAX_NEWS_ITEMS, 20
+            CONF_MAX_NEWS_ITEMS, DEFAULT_MAX_NEWS_ITEMS
         )
         self._latest_news_id: int | None = config.get(CONF_LATEST_NEWS_ID)
         self.last_scan: datetime | None = None
 
-        poll = config.get(CONF_POLL_INTERVAL, 120)
+        poll = config.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)
         update_interval = timedelta(minutes=poll)
 
         self._store = Store[dict](hass, STORAGE_VERSION, STORAGE_KEY)
@@ -59,22 +61,48 @@ class VikisVodovodNewsCoordinator(DataUpdateCoordinator):
     def _parse_keywords(raw: str) -> list[str]:
         return [kw.strip() for kw in raw.split(",") if kw.strip()]
 
+    @staticmethod
+    def _evaluate_priority(
+        title: str | None, description: str, keywords: list[str]
+    ) -> bool:
+        if not keywords:
+            return False
+        text = (title or "") + " " + description
+        lower_text = text.lower()
+        return any(kw.lower() in lower_text for kw in keywords)
+
+    def _reevaluate_priorities(self, news: list[dict]) -> list[dict]:
+        if not news:
+            return news
+        return [
+            {
+                **item,
+                "priority": self._evaluate_priority(
+                    item.get("title"),
+                    item.get("description", ""),
+                    self._filter_keywords,
+                ),
+            }
+            for item in news
+        ]
+
     def update_config(self, entry: ConfigEntry) -> None:
         self._entry = entry
         config = self._merged_config()
         self._filter_keywords = self._parse_keywords(
             config.get(CONF_KEYWORDS, "")
         )
-        self._max_news_items = config.get(CONF_MAX_NEWS_ITEMS, 20)
+        self._max_news_items = config.get(CONF_MAX_NEWS_ITEMS, DEFAULT_MAX_NEWS_ITEMS)
         self._latest_news_id = config.get(CONF_LATEST_NEWS_ID)
-        poll = config.get(CONF_POLL_INTERVAL, 120)
+        poll = config.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)
         self.update_interval = timedelta(minutes=poll)
 
-    async def _async_setup(self):
-        self._stored_data = await self._store.async_load() or {}
-
     async def _async_update_data(self) -> dict:
-        stored = self._stored_data or {}
+        if self._stored_data is None:
+            stored = await self._store.async_load()
+            self._stored_data = stored or {}
+
+        stored = self._stored_data
         news: list[dict] = stored.get("news", [])
         last_id: int | None = stored.get("last_id", self._latest_news_id)
 
@@ -82,7 +110,7 @@ class VikisVodovodNewsCoordinator(DataUpdateCoordinator):
             raise UpdateFailed("No latest_news_id configured")
 
         candidate = last_id + 1
-        limit = last_id + 1 + MAX_SCAN_ATTEMPTS
+        limit = last_id + MAX_SCAN_ATTEMPTS
         discovered: list[dict] = []
 
         while candidate <= limit:
@@ -94,7 +122,7 @@ class VikisVodovodNewsCoordinator(DataUpdateCoordinator):
             candidate += 1
 
         if discovered:
-            all_news = discovered + news
+            all_news = discovered[::-1] + news
             seen_ids = set()
             deduped = []
             for n in all_news:
@@ -103,8 +131,10 @@ class VikisVodovodNewsCoordinator(DataUpdateCoordinator):
                     seen_ids.add(nid)
                     deduped.append(n)
             news = deduped[: self._max_news_items]
+        elif news:
+            news = self._reevaluate_priorities(news)[: self._max_news_items]
 
-        if news or discovered:
+        if news:
             await self._store.async_save({"last_id": last_id, "news": news})
 
         self._stored_data = {"last_id": last_id, "news": news}
@@ -132,7 +162,7 @@ class VikisVodovodNewsCoordinator(DataUpdateCoordinator):
             self._parse_html, html, news_id
         )
 
-    def _parse_html(self, html: str, news_id: int) -> dict | None:
+    def _parse_html(self, html: str, news_id: int) -> dict:
         soup = BeautifulSoup(html, "html.parser")
 
         date_el = soup.select_one(".modal-status span.date")
@@ -150,11 +180,7 @@ class VikisVodovodNewsCoordinator(DataUpdateCoordinator):
             else ""
         )
 
-        text_to_check = (title or "") + " " + description
-        priority = False
-        if self._filter_keywords:
-            lower_text = text_to_check.lower()
-            priority = any(kw.lower() in lower_text for kw in self._filter_keywords)
+        priority = self._evaluate_priority(title, description, self._filter_keywords)
 
         return {
             "id": news_id,
