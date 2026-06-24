@@ -19,6 +19,8 @@ custom_components/
     coordinator.py      — DataUpdateCoordinator, scan logic, Store persistence
     sensor.py           — single SensorEntity, reads coordinator data
     services.yaml       — scan_now service declaration
+hacs.json               — HACS metadata
+tests/                  — unit tests (run: pytest tests/ from code/)
 ```
 
 ## Config flow (4 steps)
@@ -90,6 +92,16 @@ On startup: load from Store. On each scan: prepend new items, truncate to `max_n
 
 Entity class uses `CoordinatorEntity` + `SensorEntity` from HA. State restored via
 Store persistence in the coordinator (no `RestoreEntity` needed).
+
+## Testing
+
+Run tests from `code/`:
+
+```
+pytest tests/ -v
+```
+
+Uses mock stubs for HA dependencies in `tests/_mocks/`.
 
 ## Coordinator (`coordinator.py`)
 

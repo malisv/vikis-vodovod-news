@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Latest News ID",
+        "description": "Enter the latest known news ID to use as the starting point.",
+        "data": {
+          "latest_news_id": "Latest news ID"
+        },
+        "data_description": {
+          "latest_news_id": "Browse https://vikis.info and find the newest news article number (e.g. 606). The integration will scan for new IDs starting from this one."
+        }
+      },
+      "poll_interval": {
+        "title": "Polling Interval",
+        "description": "How often should the integration check for new news?",
+        "data": {
+          "poll_interval": "Check every (minutes)"
+        },
+        "data_description": {
+          "poll_interval": "Default: 120 minutes (2 hours). News is usually posted a few times per week at most — no need to check more often than once per hour."
+        }
+      },
+      "keywords": {
+        "title": "Priority Keywords",
+        "description": "Optional: highlight specific news with a priority flag.",
+        "data": {
+          "keywords": "Keywords (optional)"
+        },
+        "data_description": {
+          "keywords": "Comma-separated list of words or phrases. When a news title or description contains one of them, the item gets priority: true. Example: Vodovodna, Vrelo"
+        }
+      },
+      "max_news_items": {
+        "title": "Number of News Items to Store",
+        "description": "How many news items to keep in the sensor?",
+        "data": {
+          "max_news_items": "Max items"
+        },
+        "data_description": {
+          "max_news_items": "Default: 20. Older items are automatically removed when new ones arrive. Increase this if you want more history on your dashboard."
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure Vikis Vodovod News",
+        "data": {
+          "latest_news_id": "Latest news ID",
+          "poll_interval": "Check every (minutes)",
+          "keywords": "Keywords (optional)",
+          "max_news_items": "Max items"
+        },
+        "data_description": {
+          "latest_news_id": "The latest known news ID. Scanning starts from this ID + 1.",
+          "poll_interval": "How often to check for new news in minutes (default: 120).",
+          "keywords": "Comma-separated keywords that flag news as priority.",
+          "max_news_items": "Maximum number of news items to keep in the sensor state."
+        }
+      }
+    }
+  }
+}
