@@ -5,7 +5,7 @@ from homeassistant.core import HomeAssistant
 from .const import DOMAIN
 from .coordinator import VikisVodovodNewsCoordinator
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

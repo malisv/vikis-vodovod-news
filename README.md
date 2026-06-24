@@ -42,7 +42,9 @@ Copy the `custom_components/vikis_vodovod_news/` folder to your Home Assistant
 
 ## Sensor attributes
 
-The integration creates one sensor entity: `sensor.vikis_vodovod_news`
+The integration creates two entities:
+
+### `sensor.vikis_vodovod_news`
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
@@ -60,6 +62,15 @@ Each news item in the `news` list:
   "priority": true
 }
 ```
+
+### `binary_sensor.vikis_vodovod_news_warning`
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `active_warnings` | list | Active news items (date >= today) |
+| `total_news` | int | Total stored news items |
+
+**State**: `on` when any news has a date equal to or after today, `off` otherwise.
 
 ## Services
 
