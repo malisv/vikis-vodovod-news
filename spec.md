@@ -15,7 +15,7 @@ custom_components/
     manifest.json       — version, domain, HA requirements, I/O dependency
     const.py            — DOMAIN, defaults, attribute names
     __init__.py         — async_setup_entry, register services
-    config_flow.py      — UI config flow (4-step form)
+    config_flow.py      — UI config flow (4-step wizard setup, 1-step options)
     coordinator.py      — DataUpdateCoordinator, scan logic, Store persistence
     sensor.py           — single SensorEntity, reads coordinator data
     services.yaml       — scan_now service declaration
@@ -30,7 +30,7 @@ custom_components/
 | 3 | `keywords` | string (comma-separated) | no | `""` |
 | 4 | `max_news_items` | int | yes | 20 |
 
-An OptionsFlow must allow editing all fields after setup. When keywords change,
+An OptionsFlow (single form, all fields) allows editing after setup. When keywords change,
 re-compute `priority` on all stored items.
 
 ## HTML parsing (200 OK responses)
@@ -42,7 +42,7 @@ re-compute `priority` on all stored items.
 | Description | `.modal-description p` (all `<p>`, get_text, join with `\n`) | `""` |
 | Priority | `True` if any keyword (lowercased) is a substring of (title + description, lowercased) | `False` |
 
-Use `beautifulsoup4` (bundled with HA). HTTP requests via `httpx` (bundled).
+Use `beautifulsoup4` (bundled with HA). HTTP requests via `aiohttp` (`async_get_clientsession`).
 
 ## Scanning logic (in `coordinator.py`)
 
@@ -88,8 +88,8 @@ On startup: load from Store. On each scan: prepend new items, truncate to `max_n
   - `last_id`: highest scanned ID
   - `last_scan`: ISO 8601 timestamp of last scan
 
-Entity class uses `SensorEntity` from HA. Read from coordinator data.
-Use `RestoreEntity` mixin so state survives coordinator init delay.
+Entity class uses `CoordinatorEntity` + `SensorEntity` from HA. State restored via
+Store persistence in the coordinator (no `RestoreEntity` needed).
 
 ## Coordinator (`coordinator.py`)
 
@@ -111,7 +111,7 @@ Use `RestoreEntity` mixin so state survives coordinator init delay.
   "name": "Vikis Vodovod News",
   "version": "0.1.0",
   "iot_class": "cloud_polling",
-  "requirements": ["beautifulsoup4"],
+  "requirements": [],
   "dependencies": [],
   "codeowners": ["@your_github_handle"],
   "config_flow": true
