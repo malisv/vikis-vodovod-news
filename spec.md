@@ -90,16 +90,6 @@ On startup: load from Store. On each scan: prepend new items, truncate to `max_n
   - `last_id`: highest scanned ID
   - `last_scan`: ISO 8601 timestamp of last scan
 
-## Binary sensor (`binary_sensor.py`)
-
-- **Unique ID**: `"vikis_vodovod_news_warning"`
-- **Device class**: `safety`
-- **State**: `on` when any news item has a date >= today, `off` otherwise
-- **Date parsing**: `DD.MM.YYYY.` format (Serbian), trailing period stripped
-- **Attributes**:
-  - `active_warnings`: list of news items with dates >= today
-  - `total_news`: total stored items
-
 Entity class uses `CoordinatorEntity` + `SensorEntity` from HA. State restored via
 Store persistence in the coordinator (no `RestoreEntity` needed).
 
